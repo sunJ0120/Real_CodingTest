@@ -2,15 +2,13 @@ class 캐릭터의_좌표 {
     public static int xInd;
     public static int yInd;
 
-    public void move(int moveX, int moveY, int[] answer) {
+    public void move(int moveX, int moveY, int[] answer){
         int nextX = answer[0] + moveX;
         int nextY = answer[1] + moveY;
 
-        if (-xInd <= nextX && nextX <= xInd) {
-            if (-yInd <= nextY && nextY <= yInd) {
-                answer[0] = nextX;
-                answer[1] = nextY;
-            }
+        if(Math.abs(nextX) <= xInd &&  Math.abs(nextY) <= yInd){
+            answer[0] = nextX;
+            answer[1] = nextY;
         }
     }
 
