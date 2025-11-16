@@ -1,4 +1,4 @@
-class 이진_변환_반복하기 {
+class 이진_변환_반복하기_복습 {
     public String binary(int len){
         StringBuilder stb = new StringBuilder();
         while(len > 0){
@@ -29,7 +29,7 @@ class 이진_변환_반복하기 {
     }
 
     public static void main(String[] args) {
-        이진_변환_반복하기 sol = new 이진_변환_반복하기();
+        이진_변환_반복하기_복습 sol = new 이진_변환_반복하기_복습();
         String s = "110010101001";
         int[] result = sol.solution(s);
         System.out.println("[" + result[0] + ", " + result[1] + "]");

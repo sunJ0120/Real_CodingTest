@@ -7,7 +7,7 @@
 import java.util.*;
 import java.lang.*;
 
-class 롤_케이크_자르기 {
+class 롤_케이크_자르기_복습 {
     public int solution(int[] topping) {
         int answer = 0;
         HashMap<Integer,Integer> right = new HashMap<Integer,Integer>();
@@ -34,7 +34,7 @@ class 롤_케이크_자르기 {
     }
 
     public static void main(String[] args) {
-        롤_케이크_자르기 sol = new 롤_케이크_자르기();
+        롤_케이크_자르기_복습 sol = new 롤_케이크_자르기_복습();
         int[] topping = {1,2,1,3,1,4,1,2};
         int result = sol.solution(topping);
         System.out.println(result);
