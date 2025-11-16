@@ -1,124 +1,72 @@
-/**
- 1. 현재 칸이 비어있으면 현재 칸을 청소한다.
- 2. 4방향에 0이 아닌 수 밖에 없으면 청소할 수 없는거라 후진, 1이어서 벽이면 후진 못한다.
- 2-1. 후진하고 다시 1로 돌아간다.
- 3. 4방향에 0이 하나라도 있으면 Stack을 이용해서 반대 방향으로 돌리면서 (북 > 서 > 남 > 동) 앞을 체크한다.
- 3-1. 갈 수 있으면 전진하고 다시 1로 돌아간다.
- **/
-
-import java.util.*;
-import java.lang.*;
 import java.io.*;
+import java.lang.*;
+import java.util.*;
 
 public class 로봇_청소기{
-    public static ArrayDeque<Integer> que;
-    public static HashMap<Integer, int[]> NSEW;
+    public static final int[] posX = {0,1,0,-1};    // 북,동,남,서
+    public static final int[] posY = {-1,0,1,0};
 
-    public boolean isTruInd(int x, int y, int n, int m){
-        if((0<=x && x<m) && (0<=y && y<n)){
-            return true;
-        }
-        return false;
-    }
-
-    public int spinAndForward(int dir, int[] robot, String[][] map, int n, int m){
+    public boolean searchZero(int r, int c, String[][] map){
+        // 2. 현재 칸 주변 4칸 중 청소한 곳 있는지 보기
         for(int i = 0; i<4; i++){
-            que.addLast(dir);
-            dir = que.pollFirst();
-
-            int[] direct = NSEW.get(dir);
-            int nextX = direct[0] + robot[0];
-            int nextY = direct[1] + robot[1];
-            if(isTruInd(nextX,nextY, n, m) && "0".equals(map[nextY][nextX])){
-                robot[0] = nextX;
-                robot[1] = nextY;
-                return dir;
-            }
-        }
-        return dir;
-    }
-
-    // 후진
-    public boolean backUp(int dir, int[] robot, String[][] map, int n, int m){
-        int opposite = ((dir + 2) % 4);
-        int[] direct = NSEW.get(opposite);
-        int nextX = direct[0] + robot[0];
-        int nextY = direct[1] + robot[1];
-
-        if(isTruInd(nextX,nextY, n, m) && !("1".equals(map[nextY][nextX]))){    // 벽
-            robot[0] = nextX;
-            robot[1] = nextY;
-            return true;
-        }
-        return false;
-    }
-
-    //방향 탐색기
-    public boolean searchAround(int[] robot, String[][] map, int n, int m){
-        for(int i = 0; i<4; i++){
-            int[] direct = NSEW.get(i);
-            int nextX = direct[0] + robot[0];
-            int nextY = direct[1] + robot[1];
-
-            if(isTruInd(nextX,nextY, n, m) && "0".equals(map[nextY][nextX])){
+            int nextX = c + posX[i];
+            int nextY = r + posY[i];
+            if("0".equals(map[nextY][nextX])){
                 return true;
             }
         }
         return false;
     }
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int answer = 0;
-
-        // 청소판 위치
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
 
-        // 로봇 청소기 처음 위치
         st = new StringTokenizer(br.readLine());
-        int r = Integer.parseInt(st.nextToken());
-        int c = Integer.parseInt(st.nextToken());
-        int dir = Integer.parseInt(st.nextToken());
+        int r = Integer.parseInt(st.nextToken());    // 로봇 y
+        int c = Integer.parseInt(st.nextToken());    // 로봇 x
+        int dir = Integer.parseInt(st.nextToken());  // 로봇 방향
 
-        // map 만들기
+        int ans = 0;
+
         String[][] map = new String[n][m];
         for(int i = 0; i<n; i++){
             map[i] = br.readLine().split(" ");
         }
 
-        que = new ArrayDeque<Integer>();
-        NSEW = new HashMap<Integer, int[]>();
-        // 반대 방향으로 넣기
-        for(int i = 1; i<4; i++){
-            que.addLast((4-dir-i) % 4);
-        }
-        NSEW.put(0, new int[]{0,-1});  //북
-        NSEW.put(1, new int[]{1,0});  //동
-        NSEW.put(2, new int[]{0,1});  //남
-        NSEW.put(3, new int[]{-1,0});  //서
-
-        int[] robot = new int[2];
-        robot[0] = c;
-        robot[1] = r;
-
         로봇_청소기 sol = new 로봇_청소기();
 
         while(true){
-            if("0".equals(map[robot[1]][robot[0]])){
-                map[robot[1]][robot[0]] = "2";
-                answer++;
-            }else{
-                if(!sol.searchAround(robot, map, n, m)){
-                    if(!sol.backUp(dir, robot, map, n, m)){
-                        break;
-                    }
-                }else{
-                    dir = sol.spinAndForward(dir, robot, map, n, m);
+            // 1. 현재 칸 청소
+            if("0".equals(map[r][c])){
+                map[r][c] = "2";
+                ans++;
+            }
+            // 2. 빈곳 없음
+            if(!sol.searchZero(r, c, map)){
+                int backInd = (dir + 2) % 4;
+                int backX = c + posX[backInd];
+                int backY = r + posY[backInd];
+                if("1".equals(map[backY][backX])){
+                    break; //후진 불가
                 }
+
+                c = backX;
+                r = backY;
+            }else{ // 3. 빈곳 있음
+                int spinlInd = (dir + 3) % 4;
+                int spinX = c + posX[spinlInd];
+                int spinY = r + posY[spinlInd];
+
+                if("0".equals(map[spinY][spinX])){
+                    c = spinX;
+                    r = spinY;
+                }
+                dir = (dir + 3) % 4;  // 방향 바뀐대로 전환
             }
         }
-        System.out.println(answer);
+        System.out.println(ans);
     }
 }
