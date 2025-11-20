@@ -30,35 +30,22 @@ class view
 
             int num = sc.nextInt();
             int[] building = new int[num];
-            int[] height = new int[num];
 
             for(int i = 0; i<num; i++) {
-                int h = sc.nextInt();
-                building[i] = h;
-                height[i] = h;
+                building[i] = sc.nextInt();
             }
 
-            Arrays.sort(height);   // 그냥 정렬하면 된다.
+            for(int i = 2; i<num-2; i++) {
+                int maxAround = Math.max(
+                        Math.max(building[i-2], building[i-1]),
+                        Math.max(building[i+2], building[i+1])
+                );
 
-            for(int h : height) {
-                // 전부다 빼기
-                for(int i = 0; i< num; i++){
-                    building[i] -= h;
-                    height[i] -= h;
-                }
-                // 5개씩 검사, 좌변
-                List<Integer> minusBuilding = new ArrayList<Integer>();
-
-                for(int i = 2; i<num-2; i++){
-                    if(building[i] > 0 && building[i-2] <= 0 && building[i-1] <= 0 && building[i+1] <= 0 && building[i+2] <= 0){
-                        minusBuilding.add(i);
-                        answer += building[i];
-                    }
-                }
-                for(int minus : minusBuilding){
-                    building[minus] = 0;  //이미 더한 값은 지운다.
+                if(building[i] > maxAround){
+                    answer += building[i] - maxAround;
                 }
             }
+
             bw.write("#" + test_case + " " + answer + "\n");
             /////////////////////////////////////////////////////////////////////////////////////////////
         }
