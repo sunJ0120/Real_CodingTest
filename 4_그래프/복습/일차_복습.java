@@ -1,7 +1,7 @@
 import java.lang.*;
 import java.util.*;
 
-class 게임_맵_최단거리_복습 {
+class 일차_복습 {
     static class Node{
         int x;
         int y;
@@ -66,7 +66,7 @@ class 게임_맵_최단거리_복습 {
     }
 
     public static void main(String[] args) {
-        게임_맵_최단거리_복습 sol = new 게임_맵_최단거리_복습();
+        일차_복습 sol = new 일차_복습();
         int[][] maps = {
                 {1,0,1,1,1},
                 {1,0,1,0,1},
