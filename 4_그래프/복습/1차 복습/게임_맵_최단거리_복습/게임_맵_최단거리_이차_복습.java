@@ -1,7 +1,7 @@
 import java.util.*;
 import java.lang.*;
 
-class 이차_복습 {
+class 게임_맵_최단거리_이차_복습 {
     public static final int[] posX = {0,0,-1,1};
     public static final int[] posY = {-1,1,0,0};
 

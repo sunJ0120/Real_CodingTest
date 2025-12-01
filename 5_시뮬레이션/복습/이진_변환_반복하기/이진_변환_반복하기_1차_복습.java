@@ -1,4 +1,4 @@
-class 이진_변환_반복하기_복습 {
+class 이진_변환_반복하기_1차_복습 {
     public String binary(int len){
         StringBuilder stb = new StringBuilder();
         while(len > 0){

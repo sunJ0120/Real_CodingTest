@@ -7,7 +7,7 @@
 import java.util.*;
 import java.lang.*;
 
-class 롤_케이크_자르기_복습 {
+class 롤_케이크_자르기_1차_복습 {
     public int solution(int[] topping) {
         int answer = 0;
         HashMap<Integer,Integer> right = new HashMap<Integer,Integer>();
