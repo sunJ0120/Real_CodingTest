@@ -5,55 +5,33 @@ import java.io.*;
 public class 치킨_배달{
     public static int answer = Integer.MAX_VALUE;
 
-    public static int direct(List<int[]> chooses, int[][] map, int n){
+    public static int direct(List<int[]> chooses, List<int[]> houses, int[][] map, int n){
         int ans = 0;
 
-        for(int i = 0; i<n; i++){
-            for(int j = 0; j<n; j++){
-                if(map[i][j] == 1){
-                    int minn = Integer.MAX_VALUE;
-                    for(int[] choose : chooses){   // 1이면 가장 가까운 치킨 거리를 구해야 한다.
-                        int dir = Math.abs(i - choose[1]) + Math.abs(j - choose[0]);
-                        minn = Math.min(minn, dir);
-                    }
-                    ans += minn;
-                }
+        for(int[] house : houses){   // 1이면 가장 가까운 치킨 거리를 구해야 한다.
+            int minn = Integer.MAX_VALUE;
+            for(int[] choose : chooses){   // 1이면 가장 가까운 치킨 거리를 구해야 한다.
+                int dir = Math.abs(house[1] - choose[1]) + Math.abs(house[0]  - choose[0]);
+                minn = Math.min(minn, dir);
             }
+            ans += minn;
         }
 
         return ans;
     }
 
-    public static void choose(List<int[]> chickens, int[][] map,
+    public static void choose(List<int[]> chickens, List<int[]> houses, int[][] map,
                               int n, int m, int start, List<int[]> chooses){
         if(chooses.size() == m){
-            answer = Math.min(answer,direct(chooses, map, n));
+            answer = Math.min(answer,direct(chooses, houses, map, n));
             return;
-        }
-
-        if(chooses.size() < m && chooses.size() > 0){
-            answer = Math.min(answer,direct(chooses, map, n));
         }
 
         for(int i = start; i<chickens.size(); i++){
             chooses.add(chickens.get(i));
-            choose(chickens, map, n, m, i+1, chooses);
+            choose(chickens, houses, map, n, m, i+1, chooses);
             chooses.remove(chooses.size()-1);    // 백트래킹, 새로운 가지를 넣기 위함
         }
-    }
-
-    public static List<int[]> store(int[][] map, int n){
-        List<int[]> chickens = new ArrayList<int[]>();
-
-        for(int i = 0; i<n; i++){
-            for(int j = 0; j<n; j++){
-                if(map[i][j] == 2){
-                    chickens.add(new int[]{j, i});
-                }
-            }
-        }
-
-        return chickens;
     }
 
     public static void main(String[] args) throws IOException {
@@ -71,8 +49,20 @@ public class 치킨_배달{
             }
         }
 
-        List<int[]> chickens = store(map, n);    // 치킨 좌표
-        choose(chickens, map, n, m, 0, new ArrayList<int[]>());
+        List<int[]> chickens = new ArrayList<int[]>();
+        List<int[]> houses = new ArrayList<int[]>();
+
+        for(int i = 0; i<n; i++){
+            for(int j = 0; j<n; j++){
+                if(map[i][j] == 2){
+                    chickens.add(new int[]{j, i});
+                }else if(map[i][j] == 1){
+                    houses.add(new int[]{j, i});
+                }
+            }
+        }
+
+        choose(chickens, houses, map, n, m, 0, new ArrayList<int[]>());
 
         System.out.println(answer);
     }
