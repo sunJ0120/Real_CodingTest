@@ -1,92 +1,71 @@
 import java.util.*;
-import java.io.*;
 import java.lang.*;
+import java.io.*;
 
-public class 톱니바퀴{
-    public static boolean isSpin(int[][] wheels, int ind, int[] startInds, int nextInd){
-        // 나의 왼쪽이 nextInd이면, 내가 6번, 상대가 2번
-        if(ind > nextInd){
-            int targetInd = (startInds[ind] + 6) % 8;
-            int nextTargetInd = (startInds[nextInd] + 2) % 8;
+public class 톱니바퀴 {
+    private static final int WHEEL_CNT = 4;
+    private static final int SAW_TOOTH = 8;
 
-            if(wheels[ind][targetInd] != wheels[nextInd][nextTargetInd]){
-                return true;
-            }
-            return false;
+    // 인덱스 판단
+    public static boolean isTrueInd(int ind){
+        return ind >= 0 && ind < WHEEL_CNT;
+    }
+
+    // 회전 가능 여부 판단
+    public static boolean canSpin(int[][] wheels, int currentInd, int nextInd, int[] start){
+        int currentTooth;
+        int nextTooth;
+
+        if(currentInd < nextInd){  // 오른쪽으로 가고 있음
+            currentTooth = (start[currentInd] + 2) % SAW_TOOTH;
+            nextTooth = (start[nextInd] + 6) % SAW_TOOTH;
         }else{
-            int targetInd = (startInds[ind] + 2) % 8;
-            int nextTargetInd = (startInds[nextInd] + 6) % 8;
-
-            if(wheels[ind][targetInd] != wheels[nextInd][nextTargetInd]){
-                return true;
-            }
-            return false;
-        }
-    }
-    // 1. 해당하는 것의 오른쪽 왼쪽을 따로 구해야 한다.
-    public static void spin(int[] startInds, int[][] wheels, int ind, int dir){
-        List<int[]> spinInds = new ArrayList<int[]>();
-        spinInds.add(new int[]{ind,dir});
-
-        //왼쪽
-        int leftDir = dir;
-        for(int i = ind-1;i>=0; i--){
-            leftDir = -leftDir;    // 그냥 -1, 1 이므로 - 붙이면 된다.
-
-            if(isSpin(wheels, i+1, startInds, i)){
-                int[] li = {i,leftDir};
-                spinInds.add(li);
-            }else{    // 전파 방지
-                break;
-            }
+            currentTooth = (start[currentInd] + 6) % SAW_TOOTH;
+            nextTooth = (start[nextInd] + 2) % SAW_TOOTH;
         }
 
-        // 오른쪽
-        int rightDir = dir;
-        for(int i = ind+1;i<4; i++){
-            rightDir = -rightDir;
-
-            if(isSpin(wheels, i-1, startInds, i)){
-                int[] li = {i,rightDir};
-                spinInds.add(li);
-            }else{    // 전파 방지
-                break;
-            }
-        }
-
-        // 회전시킨다. **시계 방향이면 반대로 뒤로 가야한다.
-        for(int[] spinInd : spinInds){
-            startInds[spinInd[0]] = (startInds[spinInd[0]] - spinInd[1] + 8) % 8;
-        }
+        return wheels[currentInd][currentTooth] != wheels[nextInd][nextTooth];
     }
 
-    public static void main(String[] args) throws IOException{
+    // 회전 재귀 메서드
+    public static void spin(int[][] wheels, int[] start, int currentInd, int from, int dir){
+        if(from >= currentInd && isTrueInd(currentInd-1) && canSpin(wheels, currentInd, currentInd-1, start)){   // 왼쪽
+            spin(wheels, start, currentInd-1, currentInd, -dir);
+        }
+
+        if(from <= currentInd && isTrueInd(currentInd+1) && canSpin(wheels, currentInd, currentInd+1, start)){ // 오른쪽
+            spin(wheels, start, currentInd+1, currentInd, -dir);
+        }
+
+        // spin을 못할 경우, 자기 자신의 start 변경, 회전 방향과 반대
+        start[currentInd] = (start[currentInd] - dir + SAW_TOOTH) % SAW_TOOTH;
+    }
+
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int[][] wheels = new int[4][8];
-        for(int i = 0; i<4; i++){
-            char[] ch = br.readLine().toCharArray();
-            for(int j = 0; j<8; j++){
-                wheels[i][j] = ch[j] - '0';
+        int[][] wheels = new int[WHEEL_CNT][SAW_TOOTH];
+        for(int i = 0; i<WHEEL_CNT; i++){
+            char[] tooths = br.readLine().toCharArray();
+            for(int j = 0; j<SAW_TOOTH; j++){
+                wheels[i][j] = tooths[j] - '0';
             }
         }
+
+        int[] start = new int[WHEEL_CNT];
+        int ans = 0;
 
         int roop = Integer.parseInt(br.readLine());
-        int[] startInds = new int[4];
         for(int i = 0; i<roop; i++){
             StringTokenizer st = new StringTokenizer(br.readLine());
-            int num = Integer.parseInt(st.nextToken());    // 톱니 번호
-            int dir = Integer.parseInt(st.nextToken());    // 방향
-
-            spin(startInds, wheels, num-1, dir);
+            int ind = Integer.parseInt(st.nextToken());    // 톱니 인덱스
+            int dir = Integer.parseInt(st.nextToken());    // 회전 방향
+            spin(wheels, start, ind-1, ind-1, dir);
         }
 
-        // startInd에 누적해서 값 구하기
-        int ans = 0;
-        for(int i = 0;i<4; i++){
-            int startInd = startInds[i];
-            if(wheels[i][startInd] == 1){    // 12시 방향이 S극이면
-                ans += Math.pow(2,i);
-            }
+        // start에 있는거 전부 더하기
+        for(int i = 0; i<WHEEL_CNT; i++){
+            int startInd = start[i];
+            ans += (wheels[i][startInd] * Math.pow(2, i));
         }
         System.out.println(ans);
     }
